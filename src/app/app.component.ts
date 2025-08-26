@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -13,8 +13,6 @@ import { MatIconModule } from '@angular/material/icon';
   imports: [
     CommonModule,
     RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
     MatToolbarModule,
     MatButtonModule,
     MatSidenavModule,
@@ -26,19 +24,19 @@ import { MatIconModule } from '@angular/material/icon';
       <mat-sidenav #drawer class="sidenav" fixedInViewport mode="side" opened>
         <mat-toolbar>Forum</mat-toolbar>
         <mat-nav-list>
-          <a mat-list-item routerLink="/appointments" routerLinkActive="active">
+          <a mat-list-item (click)="navigate('/appointments')" [class.active]="isActive('/appointments')">
             <mat-icon matListItemIcon>event</mat-icon>
             <span matListItemTitle>Rendez-vous</span>
           </a>
-          <a mat-list-item routerLink="/comments" routerLinkActive="active">
+          <a mat-list-item (click)="navigate('/comments')" [class.active]="isActive('/comments')">
             <mat-icon matListItemIcon>comment</mat-icon>
             <span matListItemTitle>Commentaires</span>
           </a>
-          <a mat-list-item routerLink="/chat" routerLinkActive="active">
+          <a mat-list-item (click)="navigate('/chat')" [class.active]="isActive('/chat')">
             <mat-icon matListItemIcon>chat</mat-icon>
             <span matListItemTitle>Chat</span>
           </a>
-          <a mat-list-item routerLink="/annonces" routerLinkActive="active">
+          <a mat-list-item (click)="navigate('/annonces')" [class.active]="isActive('/annonces')">
             <mat-icon matListItemIcon>campaign</mat-icon>
             <span matListItemTitle>Annonces</span>
           </a>
@@ -119,4 +117,22 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class AppComponent {
   title = 'Forum';
+  
+  constructor(private router: Router) {
+    router.events.subscribe(event => {
+      console.log('Router Event:', event);
+    });
+  }
+
+  navigate(path: string) {
+    console.log('Attempting navigation to:', path);
+    this.router.navigate([path], { skipLocationChange: false }).then(
+      success => console.log('Navigation success:', success),
+      error => console.error('Navigation error:', error)
+    );
+  }
+
+  isActive(path: string): boolean {
+    return this.router.url === path;
+  }
 }

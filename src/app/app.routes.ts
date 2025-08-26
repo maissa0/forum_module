@@ -1,6 +1,20 @@
 import { Routes } from '@angular/router';
+import { AnnouncementListComponent } from './components/announcement/announcement-list.component';
+import { AnnouncementFormComponent } from './components/announcement/announcement-form.component';
 
 export const routes: Routes = [
+  {
+    path: 'annonces',
+    loadComponent: () => import('./components/announcement/announcement-list.component').then(m => m.AnnouncementListComponent)
+  },
+  {
+    path: 'annonces/create',
+    loadComponent: () => import('./components/announcement/announcement-form.component').then(m => m.AnnouncementFormComponent)
+  },
+  {
+    path: 'annonces/:id/edit',
+    loadComponent: () => import('./components/announcement/announcement-form.component').then(m => m.AnnouncementFormComponent)
+  },
   { 
     path: 'appointments', 
     loadComponent: () => import('./components/appointments/appointments.component').then(m => m.AppointmentsComponent) 
@@ -13,24 +27,23 @@ export const routes: Routes = [
     path: 'chat', 
     loadComponent: () => import('./components/chat/chat.component').then(m => m.ChatComponent) 
   },
-  {
-    path: 'annonces',
-    loadComponent: () => import('./components/announcement/announcement-list.component')
-      .then(m => m.AnnouncementListComponent)
-  },
-  {
-    path: 'annonces/create',
-    loadComponent: () => import('./components/announcement/announcement-form.component')
-      .then(m => m.AnnouncementFormComponent)
-  },
-  {
-    path: 'annonces/:id/edit',
-    loadComponent: () => import('./components/announcement/announcement-form.component')
-      .then(m => m.AnnouncementFormComponent)
-  },
   { 
     path: '', 
-    redirectTo: '/appointments', 
+    redirectTo: 'appointments', 
     pathMatch: 'full' 
-  }
-];
+  },
+      {
+        path: '',
+        component: AnnouncementListComponent
+      },
+      {
+        path: 'create',
+        component: AnnouncementFormComponent
+      },
+      {
+        path: ':id/edit',
+        component: AnnouncementFormComponent
+      }
+    ]
+  
+

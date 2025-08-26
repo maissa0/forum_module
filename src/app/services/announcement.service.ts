@@ -101,4 +101,18 @@ export class AnnouncementService {
       a.description.toLowerCase().includes(criteria.toLowerCase())
     ));
   }
+
+  rateAnnouncement(id: string, rating: number): Observable<{ average: number }> {
+    // TODO: Replace with actual API call
+    const announcement = this.mockAnnouncements.find(a => a.id === id);
+    if (announcement) {
+      // Simple mock implementation - in reality, this would be handled by the backend
+      announcement.averageRating = (announcement.averageRating 
+        ? (announcement.averageRating + rating) / 2 
+        : rating
+      );
+      return of({ average: announcement.averageRating });
+    }
+    throw new Error('Announcement not found');
+  }
 }

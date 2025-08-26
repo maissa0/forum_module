@@ -8,10 +8,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { RouterLink } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { RouterLink, RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { Announcement } from '../../models/announcement';
 import { AnnouncementService } from '../../services/announcement.service';
+import { AnnouncementDetailDialogComponent } from './announcement-detail-dialog.component';
+import { AnnouncementFormDialogComponent } from './announcement-form-dialog.component';
 
 @Component({
   selector: 'app-announcement-list',
@@ -26,7 +29,10 @@ import { AnnouncementService } from '../../services/announcement.service';
     MatIconModule,
     MatTableModule,
     MatTooltipModule,
-    RouterLink
+    MatDialogModule,
+    RouterModule,
+    RouterLink,
+    AnnouncementFormDialogComponent
   ],
   template: `
     <div class="container">
@@ -52,11 +58,11 @@ import { AnnouncementService } from '../../services/announcement.service';
             <button 
               mat-raised-button 
               color="primary"
-              routerLink="/annonces/create"
+              (click)="openCreateDialog()"
               class="add-button"
             >
               <mat-icon>add</mat-icon>
-              Nouvelle Annonce
+              
             </button>
           </div>
 
@@ -97,7 +103,7 @@ import { AnnouncementService } from '../../services/announcement.service';
                 <button 
                   mat-icon-button 
                   color="primary"
-                  [routerLink]="['/annonces', element.id]"
+                  (click)="openDetailDialog(element); $event.stopPropagation()"
                   matTooltip="Voir les détails"
                 >
                   <mat-icon>visibility</mat-icon>
@@ -105,7 +111,7 @@ import { AnnouncementService } from '../../services/announcement.service';
                 <button 
                   mat-icon-button 
                   color="primary"
-                  [routerLink]="['/annonces', element.id, 'edit']"
+                  (click)="openEditDialog(element); $event.stopPropagation()"
                   matTooltip="Modifier"
                 >
                   <mat-icon>edit</mat-icon>
@@ -122,13 +128,30 @@ import { AnnouncementService } from '../../services/announcement.service';
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr 
+              mat-row 
+              *matRowDef="let row; columns: displayedColumns;"
+              (click)="openDetailDialog(row)"
+              style="cursor: pointer;"
+              class="announcement-row"
+            ></tr>
           </table>
         </mat-card-content>
       </mat-card>
     </div>
   `,
   styles: [`
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     :host {
       display: block;
       min-height: calc(100vh - 64px);
@@ -177,12 +200,38 @@ import { AnnouncementService } from '../../services/announcement.service';
     }
 
     .add-button {
-      background-color: #196E66;
+      background: linear-gradient(135deg, #2f5f5aff, #196E66);
+      width: 48px;
       height: 48px;
+      min-width: 48px;
+      min-height: 48px;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+      margin-top: -30px;
+      transition: transform 0.2s;
+    }
+
+    .add-button mat-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      line-height: 1;
+      margin-right: -3px;
     }
 
     .add-button:hover {
-      background-color: #145c55;
+      background: linear-gradient(135deg, #275450, #145c55);
     }
 
     table {
@@ -276,6 +325,11 @@ import { AnnouncementService } from '../../services/announcement.service';
     .fade-in {
       animation: fadeIn 0.3s ease-in;
     }
+
+    .announcement-row:hover {
+      background-color: #f5f5f5;
+      transition: background-color 0.2s ease;
+    }
   `]
 })
 export class AnnouncementListComponent implements OnInit {
@@ -283,7 +337,10 @@ export class AnnouncementListComponent implements OnInit {
   displayedColumns: string[] = ['title', 'description', 'category', 'date', 'actions'];
   searchControl = new FormControl('');
 
-  constructor(private announcementService: AnnouncementService) {
+  constructor(
+    private announcementService: AnnouncementService,
+    private dialog: MatDialog
+  ) {
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged()
@@ -318,5 +375,44 @@ export class AnnouncementListComponent implements OnInit {
         this.loadAnnouncements();
       });
     }
+  }
+
+  openDetailDialog(announcement: Announcement): void {
+    const dialogRef = this.dialog.open(AnnouncementDetailDialogComponent, {
+      data: announcement,
+      width: '600px',
+      maxHeight: '90vh'
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.loadAnnouncements();
+    });
+  }
+
+  openCreateDialog(): void {
+    const dialogRef = this.dialog.open(AnnouncementFormDialogComponent, {
+      width: '450px',
+      maxHeight: '90vh'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadAnnouncements();
+      }
+    });
+  }
+
+  openEditDialog(announcement: Announcement): void {
+    const dialogRef = this.dialog.open(AnnouncementFormDialogComponent, {
+      width: '450px',
+      maxHeight: '90vh',
+      data: { announcement }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadAnnouncements();
+      }
+    });
   }
 }
