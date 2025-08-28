@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
-import { AnnouncementListComponent } from './components/announcement/announcement-list.component';
-import { AnnouncementFormComponent } from './components/announcement/announcement-form.component';
+import { AuthGuard } from './shared/auth.guard';
 
 export const routes: Routes = [
   {
@@ -8,28 +7,34 @@ export const routes: Routes = [
     loadComponent: () => import('./components/login/login.component').then(m => m.LoginComponent)
   },
   {
+    path: 'appointments',
+    loadComponent: () => import('./components/appointments/appointments.component').then(m => m.AppointmentsComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'annonces',
-    loadComponent: () => import('./components/announcement/announcement-list.component').then(m => m.AnnouncementListComponent)
+    loadComponent: () => import('./components/announcement/announcement-list.component').then(m => m.AnnouncementListComponent),
+    canActivate: [AuthGuard]
   },
   {
     path: 'annonces/create',
-    loadComponent: () => import('./components/announcement/announcement-form.component').then(m => m.AnnouncementFormComponent)
+    loadComponent: () => import('./components/announcement/announcement-form.component').then(m => m.AnnouncementFormComponent),
+    canActivate: [AuthGuard]
   },
   {
     path: 'annonces/:id/edit',
-    loadComponent: () => import('./components/announcement/announcement-form.component').then(m => m.AnnouncementFormComponent)
-  },
-  {
-    path: 'appointments',
-    loadComponent: () => import('./components/appointments/appointments.component').then(m => m.AppointmentsComponent)
+    loadComponent: () => import('./components/announcement/announcement-form.component').then(m => m.AnnouncementFormComponent),
+    canActivate: [AuthGuard]
   },
   {
     path: 'comments',
-    loadComponent: () => import('./components/comments/comments.component').then(m => m.CommentsComponent)
+    loadComponent: () => import('./components/comments/comments.component').then(m => m.CommentsComponent),
+    canActivate: [AuthGuard]
   },
   {
     path: 'chat',
-    loadComponent: () => import('./components/chat/chat.component').then(m => m.ChatComponent)
+    loadComponent: () => import('./components/chat/chat.component').then(m => m.ChatComponent),
+    canActivate: [AuthGuard]
   },
   {
     path: '',
